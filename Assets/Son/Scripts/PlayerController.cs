@@ -47,6 +47,8 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         
+        if (FindObjectOfType<InventoryController>().IsInventoryOpen())
+            return;
         // Lấy input di chuyển (chỉ khi không đang tưới nước)
         if (!isWatering)
         {
