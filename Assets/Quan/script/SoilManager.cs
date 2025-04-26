@@ -1,29 +1,53 @@
-﻿using UnityEngine;
+﻿// Script: DiggingHandler.cs
+using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class SoilManager : MonoBehaviour
+[RequireComponent(typeof(Tilemap))]
+[RequireComponent(typeof(TilemapCollider2D))]
+public class DiggingHandler : MonoBehaviour
 {
-    public Tilemap soilTilemap; // Kéo Tilemap vào Inspector
-    public TileBase normalSoilTile; // Tile đất thường
-    public TileBase dugSoilTile;    // Tile đất đã cuốc (màu nâu)
+    [Header("Cài đặt Tile")]
+    public TileBase normalDirtTile;  // Tile đất thường
+    public TileBase dugDirtTile;    // Tile đất đã đào
 
-    void Update()
+    [Header("Tham chiếu Tilemap")]
+    public Tilemap dugDirtTilemap;  // Tilemap chứa đất đã đào
+
+    private Tilemap currentTilemap;
+    private TilemapCollider2D tilemapCollider;
+
+    private void Awake()
     {
-        if (Input.GetMouseButtonDown(0)) // Click chuột trái
+        currentTilemap = GetComponent<Tilemap>();
+        tilemapCollider = GetComponent<TilemapCollider2D>();
+
+        // Thiết lập Collider là Trigger
+        tilemapCollider.isTrigger = true;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Dig"))
         {
-            Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            DigAt(mousePos);
+            Vector3 hitPosition = other.transform.position;
+            Vector3Int cellPosition = currentTilemap.WorldToCell(hitPosition);
+
+            // Chỉ xử lý nếu có tile tại vị trí này
+            if (currentTilemap.HasTile(cellPosition))
+            {
+                DigTile(cellPosition);
+            }
         }
     }
 
-    void DigAt(Vector2 worldPos)
+    private void DigTile(Vector3Int cellPosition)
     {
-        Vector3Int cellPos = soilTilemap.WorldToCell(worldPos);
+        // Xóa tile đất thường
+        currentTilemap.SetTile(cellPosition, null);
 
-        if (soilTilemap.GetTile(cellPos) == normalSoilTile)
-        {
-            soilTilemap.SetTile(cellPos, dugSoilTile);
-            Debug.Log($"Đã cuốc đất tại: {cellPos}");
-        }
+        // Thêm tile đất đã đào vào Tilemap khác
+        dugDirtTilemap.SetTile(cellPosition, dugDirtTile);
+
+        Debug.Log($"Đã đào tại vị trí ô: {cellPosition}");
     }
 }
