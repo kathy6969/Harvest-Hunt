@@ -1,53 +1,73 @@
-﻿// Script: DiggingHandler.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
 [RequireComponent(typeof(Tilemap))]
 [RequireComponent(typeof(TilemapCollider2D))]
-public class DiggingHandler : MonoBehaviour
+public class DiggingSystem : MonoBehaviour
 {
-    [Header("Cài đặt Tile")]
-    public TileBase normalDirtTile;  // Tile đất thường
-    public TileBase dugDirtTile;    // Tile đất đã đào
+    [Header("Tile Settings")]
+    public TileBase dugDirtTile;
+    public Tilemap dugDirtTilemap;
 
-    [Header("Tham chiếu Tilemap")]
-    public Tilemap dugDirtTilemap;  // Tilemap chứa đất đã đào
+    [Header("Digging Settings")]
+    public float digCooldown = 0.1f;
+    public Vector2 digSize = new Vector2(0.8f, 0.8f);
 
-    private Tilemap currentTilemap;
-    private TilemapCollider2D tilemapCollider;
+    private Tilemap _normalDirtTilemap;
+    private TilemapCollider2D _collider;
+    private float _lastDigTime;
 
     private void Awake()
     {
-        currentTilemap = GetComponent<Tilemap>();
-        tilemapCollider = GetComponent<TilemapCollider2D>();
-
-        // Thiết lập Collider là Trigger
-        tilemapCollider.isTrigger = true;
+        _normalDirtTilemap = GetComponent<Tilemap>();
+        _collider = GetComponent<TilemapCollider2D>();
+        _collider.isTrigger = true;
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void Update()
     {
-        if (other.CompareTag("Dig"))
+        if (Input.GetMouseButton(0)) // Khi giữ chuột trái
         {
-            Vector3 hitPosition = other.transform.position;
-            Vector3Int cellPosition = currentTilemap.WorldToCell(hitPosition);
+            TryDigAtMousePosition();
+        }
+    }
 
-            // Chỉ xử lý nếu có tile tại vị trí này
-            if (currentTilemap.HasTile(cellPosition))
+    private void TryDigAtMousePosition()
+    {
+        if (Time.time - _lastDigTime < digCooldown) return;
+
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0;
+
+        Vector3Int cellPos = _normalDirtTilemap.WorldToCell(mouseWorldPos);
+
+        // Kiểm tra trong phạm vi digSize
+        Collider2D hit = Physics2D.OverlapBox(mouseWorldPos, digSize, 0);
+        if (hit != null && hit.CompareTag("Dig"))
+        {
+            if (_normalDirtTilemap.HasTile(cellPos))
             {
-                DigTile(cellPosition);
+                DigTile(cellPos);
+                _lastDigTime = Time.time;
             }
         }
     }
 
     private void DigTile(Vector3Int cellPosition)
     {
-        // Xóa tile đất thường
-        currentTilemap.SetTile(cellPosition, null);
-
-        // Thêm tile đất đã đào vào Tilemap khác
+        _normalDirtTilemap.SetTile(cellPosition, null);
         dugDirtTilemap.SetTile(cellPosition, dugDirtTile);
+    }
 
-        Debug.Log($"Đã đào tại vị trí ô: {cellPosition}");
+    // Vẽ khung debug
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying) return;
+
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = 0;
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(mousePos, digSize);
     }
 }
