@@ -3030,9 +3030,8 @@ GameObject:
   - component: {fileID: 1591918408}
   - component: {fileID: 1591918407}
   - component: {fileID: 1591918406}
-  - component: {fileID: 1591918410}
-  - component: {fileID: 1591918409}
   - component: {fileID: 1591918411}
+  - component: {fileID: 1591918412}
   m_Layer: 0
   m_Name: Player_6
   m_TagString: Untagged
@@ -3100,7 +3099,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1591918403}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3193,30 +3192,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &1591918409
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1591918403}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8af7465b3b94ef94c87414c2afaab5d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1591918410
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1591918403}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c367c5162175b5a4897c9ef9ea978d8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1591918411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3229,10 +3204,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1a06cbd9f17a764ba8da309a7725991, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player: {fileID: 1591918403}
+  allPlantPrefabs:
+  - plantType: WheatSeed
+    prefab: {fileID: 1836767199809292352, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+  - plantType: Wheat
+    prefab: {fileID: 89374560984441269, guid: 48d4dc4cced963e4085acd631cd5a328, type: 3}
+  - plantType: WheatItem
+    prefab: {fileID: 3724596949910066912, guid: 84560d6d26f2b9d4ca954d3d8a1950e8, type: 3}
+  allPlantedObjects:
+  - {fileID: 3724596949910066912, guid: 84560d6d26f2b9d4ca954d3d8a1950e8, type: 3}
   pauseMenuUI: {fileID: 1967237183}
   saveButton: {fileID: 1437123514}
   loadButton: {fileID: 519268120}
-  player: {fileID: 1591918403}
+--- !u!114 &1591918412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1591918403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc0c3665164a7bc479d40a73a2a3ef83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1829245278
 GameObject:
   m_ObjectHideFlags: 0
@@ -3489,6 +3485,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1967237183}
   m_CullTransparentMesh: 1
+--- !u!1001 &2082929357
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1836767199809292352, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_Name
+      value: WheatSeed
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.8438326
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.1770418
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7774393362431685554, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3497,3 +3550,4 @@ SceneRoots:
   - {fileID: 1591918405}
   - {fileID: 85612054}
   - {fileID: 443555636}
+  - {fileID: 2082929357}

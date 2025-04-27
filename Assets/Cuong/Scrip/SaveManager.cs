@@ -1,32 +1,40 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 public static class SaveManager
 {
-    private static string savePath = Application.persistentDataPath + "/playerdata.json";
+    static string savePath = Application.persistentDataPath + "/savegame.json";
 
-    public static void SavePlayerPosition(Vector3 position)
+    public static void SaveGame(Vector3 playerPosition, List<GameObject> allPlants)
     {
-        PlayerData data = new PlayerData();
-        data.SetPosition(position);
+        PlayerData data = new PlayerData(playerPosition);
+
+        foreach (var plant in allPlants)
+        {
+            Plant plantScript = plant.GetComponent<Plant>();
+            if (plantScript != null)
+            {
+                data.plantList.Add(new PlantData(plant.transform.position, plantScript.plantType));
+            }
+        }
 
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(savePath, json);
-        Debug.Log("Đã lưu vị trí tại: " + savePath);
+
+        Debug.Log("Game Saved at: " + savePath);
     }
 
-    public static Vector3 LoadPlayerPosition()
+    public static PlayerData LoadGame()
     {
-        if (File.Exists(savePath))
+        if (!File.Exists(savePath))
         {
-            string json = File.ReadAllText(savePath);
-            PlayerData data = JsonUtility.FromJson<PlayerData>(json);
-            return data.GetPosition();
+            Debug.LogWarning("No save file found!");
+            return null;
         }
-        else
-        {
-            Debug.Log("Chưa có dữ liệu vị trí.");
-            return Vector3.zero;
-        }
+
+        string json = File.ReadAllText(savePath);
+        PlayerData data = JsonUtility.FromJson<PlayerData>(json);
+        return data;
     }
 }

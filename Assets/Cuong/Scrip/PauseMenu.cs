@@ -1,15 +1,23 @@
-﻿using System.Collections;
+﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
+
+[System.Serializable]
+public class PlantPrefabData
+{
+    public string plantType;
+    public GameObject prefab;
+}
 
 public class PauseMenu : MonoBehaviour
 {
+    public GameObject player;   // Kéo Player vô đây
+    public List<PlantPrefabData> allPlantPrefabs;
+    public List<GameObject> allPlantedObjects = new List<GameObject>();
+
     public GameObject pauseMenuUI;
     public Button saveButton;
     public Button loadButton;
-    public GameObject player; // Gán player vào đây từ Inspector
-
     private bool isPaused = false;
 
     void Start()
@@ -39,16 +47,54 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-    void SaveGame()
+    public void SaveGame()
     {
-        SaveManager.SavePlayerPosition(player.transform.position);
-        Debug.Log("Đã lưu game!");
+        SaveManager.SaveGame(player.transform.position, allPlantedObjects);
     }
 
-    void LoadGame()
+    public void LoadGame()
     {
-        Vector3 loadedPos = SaveManager.LoadPlayerPosition();
-        player.transform.position = loadedPos;
-        Debug.Log("Đã load game!");
+        PlayerData data = SaveManager.LoadGame();
+        if (data == null) return;
+
+        // Load vị trí player
+        player.transform.position = data.GetPlayerPosition();
+
+        // Xóa cây cũ
+        foreach (var plant in allPlantedObjects)
+        {
+            Destroy(plant);
+        }
+        allPlantedObjects.Clear();
+
+        // Load lại cây
+        foreach (var plantData in data.plantList)
+        {
+            GameObject prefab = GetPlantPrefabByType(plantData.plantType);
+            if (prefab != null)
+            {
+                GameObject newPlant = Instantiate(prefab, plantData.GetPosition(), Quaternion.identity);
+                Plant plantScript = newPlant.GetComponent<Plant>();
+                if (plantScript != null)
+                {
+                    plantScript.plantType = plantData.plantType;
+                }
+                allPlantedObjects.Add(newPlant);
+            }
+            else
+            {
+                Debug.LogError("Không tìm thấy Prefab cho loại cây: " + plantData.plantType);
+            }
+        }
+    }
+
+    GameObject GetPlantPrefabByType(string type)
+    {
+        foreach (var item in allPlantPrefabs)
+        {
+            if (item.plantType == type)
+                return item.prefab;
+        }
+        return null;
     }
 }

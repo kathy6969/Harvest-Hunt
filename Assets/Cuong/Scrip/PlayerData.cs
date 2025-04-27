@@ -1,21 +1,24 @@
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
 public class PlayerData
 {
-    public float x;
-    public float y;
-    public float z;
+    public float playerPosX;
+    public float playerPosY;
+    public float playerPosZ;
 
-    public Vector3 GetPosition()
+    public List<PlantData> plantList = new List<PlantData>();
+
+    public PlayerData(Vector3 playerPos)
     {
-        return new Vector3(x, y, z);
+        playerPosX = playerPos.x;
+        playerPosY = playerPos.y;
+        playerPosZ = playerPos.z;
     }
 
-    public void SetPosition(Vector3 pos)
+    public Vector3 GetPlayerPosition()
     {
-        x = pos.x;
-        y = pos.y;
-        z = pos.z;
+        return new Vector3(playerPosX, playerPosY, playerPosZ);
     }
 }
