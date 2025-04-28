@@ -2,39 +2,75 @@
 using System.IO;
 using UnityEngine;
 
-public static class SaveManager
+[System.Serializable]
+public class SaveData
 {
-    static string savePath = Application.persistentDataPath + "/savegame.json";
+    public SerializableVector3 playerPosition;
+    public List<PlantData> plants = new List<PlantData>();
+}
+
+[System.Serializable]
+public struct SerializableVector3
+{
+    public float x, y, z;
+
+    public SerializableVector3(Vector3 vector)
+    {
+        x = vector.x;
+        y = vector.y;
+        z = vector.z;
+    }
+
+    public Vector3 ToVector3()
+    {
+        return new Vector3(x, y, z);
+    }
+}
+
+public class SaveManager : MonoBehaviour
+{
+    public static string saveFilePath;
+
+    private static void Awake()
+    {
+        saveFilePath = Path.Combine(Application.persistentDataPath, "savegame.json");
+    }
 
     public static void SaveGame(Vector3 playerPosition, List<GameObject> allPlants)
     {
-        PlayerData data = new PlayerData(playerPosition);
+        SaveData saveData = new SaveData();
+        saveData.playerPosition = new SerializableVector3(playerPosition);
 
-        foreach (var plant in allPlants)
+        foreach (GameObject plantObj in allPlants)
         {
-            Plant plantScript = plant.GetComponent<Plant>();
-            if (plantScript != null)
-            {
-                data.plantList.Add(new PlantData(plant.transform.position, plantScript.plantType));
-            }
+            if (plantObj == null) continue;
+
+            PlantData plantData = new PlantData();//err
+            plantData.position = new SerializableVector3(plantObj.transform.position);
+            plantData.plantType = plantObj.name.Replace("(Clone)", "").Trim();
+
+            saveData.plants.Add(plantData);
         }
 
-        string json = JsonUtility.ToJson(data, true);
-        File.WriteAllText(savePath, json);
+        string json = JsonUtility.ToJson(saveData, true);
+        File.WriteAllText(saveFilePath, json);
 
-        Debug.Log("Game Saved at: " + savePath);
+        Debug.Log("Đã lưu game vào: " + saveFilePath);
     }
 
-    public static PlayerData LoadGame()
+    public static SaveData LoadGame()
     {
-        if (!File.Exists(savePath))
+        if (File.Exists(saveFilePath))
         {
-            Debug.LogWarning("No save file found!");
+            string json = File.ReadAllText(saveFilePath);
+            SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+            Debug.Log("Đã load game từ: " + saveFilePath);
+            return saveData;
+        }
+        else
+        {
+            Debug.LogWarning("Không tìm thấy file lưu game!");
             return null;
         }
-
-        string json = File.ReadAllText(savePath);
-        PlayerData data = JsonUtility.FromJson<PlayerData>(json);
-        return data;
     }
 }

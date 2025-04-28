@@ -3208,12 +3208,9 @@ MonoBehaviour:
   allPlantPrefabs:
   - plantType: WheatSeed
     prefab: {fileID: 1836767199809292352, guid: 13e6b54862641d44ba19b835837571c5, type: 3}
-  - plantType: Wheat
-    prefab: {fileID: 89374560984441269, guid: 48d4dc4cced963e4085acd631cd5a328, type: 3}
   - plantType: WheatItem
     prefab: {fileID: 3724596949910066912, guid: 84560d6d26f2b9d4ca954d3d8a1950e8, type: 3}
-  allPlantedObjects:
-  - {fileID: 3724596949910066912, guid: 84560d6d26f2b9d4ca954d3d8a1950e8, type: 3}
+  allPlantedObjects: []
   pauseMenuUI: {fileID: 1967237183}
   saveButton: {fileID: 1437123514}
   loadButton: {fileID: 519268120}

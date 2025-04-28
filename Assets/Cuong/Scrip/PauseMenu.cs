@@ -15,6 +15,7 @@ public class PauseMenu : MonoBehaviour
     public List<PlantPrefabData> allPlantPrefabs;
     public List<GameObject> allPlantedObjects = new List<GameObject>();
 
+
     public GameObject pauseMenuUI;
     public Button saveButton;
     public Button loadButton;
@@ -22,6 +23,7 @@ public class PauseMenu : MonoBehaviour
 
     void Start()
     {
+
         pauseMenuUI.SetActive(false); // Ẩn Menu lúc đầu
 
         // Gán chức năng cho nút
@@ -52,13 +54,19 @@ public class PauseMenu : MonoBehaviour
         SaveManager.SaveGame(player.transform.position, allPlantedObjects);
     }
 
+    
     public void LoadGame()
     {
-        PlayerData data = SaveManager.LoadGame();
+
+        SaveData data = SaveManager.LoadGame();
         if (data == null) return;
 
+        PlayerData playerData = new PlayerData(new Vector3());
+
+        playerData.plantList = new List<PlantData>(playerData.plantList);
+
         // Load vị trí player
-        player.transform.position = data.GetPlayerPosition();
+        player.transform.position = playerData.GetPlayerPosition();
 
         // Xóa cây cũ
         foreach (var plant in allPlantedObjects)
@@ -68,7 +76,7 @@ public class PauseMenu : MonoBehaviour
         allPlantedObjects.Clear();
 
         // Load lại cây
-        foreach (var plantData in data.plantList)
+        foreach (var plantData in playerData.plantList)
         {
             GameObject prefab = GetPlantPrefabByType(plantData.plantType);
             if (prefab != null)
