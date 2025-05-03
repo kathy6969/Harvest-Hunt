@@ -46,10 +46,7 @@ public class HoeSystem : MonoBehaviour
                 {
                     tilemap.SetTile(cellPos, hoedTile);  // Đào cỏ thành đất
                 }
-                else if (currentTile == hoedTile)
-                {
-                    tilemap.SetTile(cellPos, grassTile); // Đổi lại cỏ (nếu muốn)
-                }
+
             }
             else
             {
