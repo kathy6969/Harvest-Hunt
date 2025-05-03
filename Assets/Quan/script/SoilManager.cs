@@ -1,73 +1,76 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-[RequireComponent(typeof(Tilemap))]
-[RequireComponent(typeof(TilemapCollider2D))]
-public class DiggingSystem : MonoBehaviour
+public class HoeSystem : MonoBehaviour
 {
-    [Header("Tile Settings")]
-    public TileBase dugDirtTile;
-    public Tilemap dugDirtTilemap;
+    public Tilemap tilemap;
+    public TileBase grassTile;    // Tile cỏ
+    public TileBase hoedTile;     // Tile đã cuốc
+    public Transform player;
+    public LineRenderer lineRenderer;
 
-    [Header("Digging Settings")]
-    public float digCooldown = 0.1f;
-    public Vector2 digSize = new Vector2(0.8f, 0.8f);
+    private Vector3Int lastCell;
 
-    private Tilemap _normalDirtTilemap;
-    private TilemapCollider2D _collider;
-    private float _lastDigTime;
-
-    private void Awake()
+    void Start()
     {
-        _normalDirtTilemap = GetComponent<Tilemap>();
-        _collider = GetComponent<TilemapCollider2D>();
-        _collider.isTrigger = true;
+        lineRenderer.positionCount = 5;
+        lineRenderer.loop = false;
+        lineRenderer.widthMultiplier = 0.05f;
+        lineRenderer.useWorldSpace = true;
+
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.startColor = Color.green;
+        lineRenderer.endColor = Color.green;
     }
 
-    private void Update()
+    void Update()
     {
-        if (Input.GetMouseButton(0)) // Khi giữ chuột trái
-        {
-            TryDigAtMousePosition();
-        }
-    }
-
-    private void TryDigAtMousePosition()
-    {
-        if (Time.time - _lastDigTime < digCooldown) return;
-
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPos.z = 0;
+        Vector3Int cellPos = tilemap.WorldToCell(mouseWorldPos);
+        Vector3Int playerCell = tilemap.WorldToCell(player.position);
 
-        Vector3Int cellPos = _normalDirtTilemap.WorldToCell(mouseWorldPos);
+        bool isInRange = Mathf.Abs(cellPos.x - playerCell.x) <= 1 && Mathf.Abs(cellPos.y - playerCell.y) <= 1;
 
-        // Kiểm tra trong phạm vi digSize
-        Collider2D hit = Physics2D.OverlapBox(mouseWorldPos, digSize, 0);
-        if (hit != null && hit.CompareTag("Dig"))
+        if (cellPos != lastCell)
         {
-            if (_normalDirtTilemap.HasTile(cellPos))
+            lastCell = cellPos;
+            DrawHighlight(cellPos, isInRange ? Color.green : Color.red);
+        }
+
+        if (Input.GetMouseButtonDown(0))  // Chuột trái
+        {
+            if (isInRange)
             {
-                DigTile(cellPos);
-                _lastDigTime = Time.time;
+                TileBase currentTile = tilemap.GetTile(cellPos);
+                if (currentTile == grassTile)
+                {
+                    tilemap.SetTile(cellPos, hoedTile);  // Đào cỏ thành đất
+                }
+                else if (currentTile == hoedTile)
+                {
+                    tilemap.SetTile(cellPos, grassTile); // Đổi lại cỏ (nếu muốn)
+                }
+            }
+            else
+            {
+                Debug.Log("Ô ngoài phạm vi cuốc!");
             }
         }
     }
 
-    private void DigTile(Vector3Int cellPosition)
+    void DrawHighlight(Vector3Int cell, Color color)
     {
-        _normalDirtTilemap.SetTile(cellPosition, null);
-        dugDirtTilemap.SetTile(cellPosition, dugDirtTile);
-    }
+        Vector3 cellWorldPos = tilemap.GetCellCenterWorld(cell);
+        Vector3 cellSize = tilemap.cellSize;
 
-    // Vẽ khung debug
-    private void OnDrawGizmos()
-    {
-        if (!Application.isPlaying) return;
+        Vector3 bottomLeft = cellWorldPos + new Vector3(-cellSize.x / 2, -cellSize.y / 2, 0);
+        Vector3 bottomRight = cellWorldPos + new Vector3(cellSize.x / 2, -cellSize.y / 2, 0);
+        Vector3 topRight = cellWorldPos + new Vector3(cellSize.x / 2, cellSize.y / 2, 0);
+        Vector3 topLeft = cellWorldPos + new Vector3(-cellSize.x / 2, cellSize.y / 2, 0);
 
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.z = 0;
+        lineRenderer.startColor = color;
+        lineRenderer.endColor = color;
 
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(mousePos, digSize);
+        lineRenderer.SetPositions(new Vector3[] { bottomLeft, bottomRight, topRight, topLeft, bottomLeft });
     }
 }
