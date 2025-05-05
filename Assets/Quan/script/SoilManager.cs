@@ -47,6 +47,7 @@ public class HoeSystem : MonoBehaviour
                 {
                     tilemap1.SetTile(cellPos, null);          // Xóa tile ở tilemap1
                     tilemap2.SetTile(cellPos, hoedTile);     // Vẽ tile đã cuốc lên tilemap2
+                    FarmManager.Instance.AddHoedTile(cellPos);
                     Debug.Log($"Đã cuốc ô {cellPos}");
                 }
                 else

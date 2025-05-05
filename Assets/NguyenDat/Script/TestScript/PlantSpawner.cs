@@ -1,53 +1,50 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class NewBehaviourScript : MonoBehaviour
+public class PlantSpawner : MonoBehaviour
 {
-    public GameObject plantPrefab;      // Prefab cây (kéo vào từ Inspector)
-    private Camera mainCamera;
-    private Tilemap hoedTilemap;
+    public GameObject plantPrefab;
+    public Grid grid; // Gán qua Inspector
+    public Camera mainCamera;
+
     private SeedFollowMouse followScript;
 
     void Start()
     {
-        mainCamera = Camera.main;
-
-        // Tìm tilemap có tag "Hoed"
-        GameObject hoedTilemapObj = GameObject.FindGameObjectWithTag("Hoed");
-        if (hoedTilemapObj != null)
-        {
-            hoedTilemap = hoedTilemapObj.GetComponent<Tilemap>();
-        }
-        else
-        {
-            Debug.LogError("Không tìm thấy Tilemap có tag 'Hoed'!");
-        }
-
         followScript = GetComponent<SeedFollowMouse>();
+
+        if (mainCamera == null)
+            mainCamera = Camera.main;
+
+        // Tự động tìm Grid ở cha hoặc trong scene
+        if (grid == null)
+            grid = GetComponentInParent<Grid>();
+        if (grid == null)
+            grid = FindObjectOfType<Grid>();
+
+        if (grid == null)
+            Debug.LogError("Không tìm thấy Grid trong PlantSpawner!");
     }
 
     void Update()
     {
         if (followScript != null && followScript.IsFollowing())
         {
-            if (Input.GetMouseButtonDown(1) && hoedTilemap != null)
+            if (Input.GetMouseButtonDown(1)) // Chuột phải
             {
                 Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
                 mouseWorldPos.z = 0f;
 
-                Vector3Int cellPos = hoedTilemap.WorldToCell(mouseWorldPos);
+                Vector3Int cellPos = grid.WorldToCell(mouseWorldPos);
+                Vector3 spawnPos = grid.GetCellCenterWorld(cellPos);
 
-                // Kiểm tra có tile tại ô đó hay không
-                if (hoedTilemap.HasTile(cellPos))
+                // Kiểm tra: có thể trồng và chưa có cây
+                if (FarmManager.Instance.IsTileHoed(cellPos) && !FarmManager.Instance.HasCrop(cellPos))
                 {
-                    Vector3 spawnPos = hoedTilemap.GetCellCenterWorld(cellPos);
-                    Instantiate(plantPrefab, spawnPos, Quaternion.identity);
-                }
-                else
-                {
-                    Debug.Log("Không có đất đã cuốc ở đây, không thể trồng.");
+                    GameObject newPlant = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
+
+                    // (Không cần gọi SetCellPosition nếu CropGrowth không có)
+                    FarmManager.Instance.AddCrop(cellPos, newPlant);
                 }
             }
         }

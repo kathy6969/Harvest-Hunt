@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class CropGrowth : MonoBehaviour
 {
-    public Sprite[] growthStages;           // Các giai đoạn phát triển (4 sprites)
-    public float timeBetweenStages = 5f;    // Thời gian giữa các giai đoạn
-    public GameObject harvestItemPrefab;    // Prefab khi thu hoạch
+    public Sprite[] growthStages;
+    public float timeBetweenStages = 5f;
+    public GameObject harvestItemPrefab;
 
     private int currentStage = 0;
     private SpriteRenderer spriteRenderer;
+    private float timer = 0f;
     private bool isFullyGrown = false;
     private Camera mainCamera;
+    private Vector3Int cellPosition;
 
     void Start()
     {
@@ -18,29 +19,30 @@ public class CropGrowth : MonoBehaviour
         mainCamera = Camera.main;
 
         if (growthStages.Length > 0)
-        {
             spriteRenderer.sprite = growthStages[0];
-            StartCoroutine(Grow());
-        }
-    }
-
-    IEnumerator Grow()
-    {
-        while (currentStage < growthStages.Length - 1)
-        {
-            yield return new WaitForSeconds(timeBetweenStages);
-
-            currentStage++;
-            spriteRenderer.sprite = growthStages[currentStage];
-        }
-
-        // Khi đã đạt giai đoạn cuối
-        isFullyGrown = true;
     }
 
     void Update()
     {
-        // Chỉ cho thu hoạch nếu đã trưởng thành
+        if (!isFullyGrown)
+        {
+            timer += Time.deltaTime;
+            if (timer >= timeBetweenStages)
+            {
+                timer = 0f;
+                currentStage++;
+
+                if (currentStage < growthStages.Length)
+                {
+                    spriteRenderer.sprite = growthStages[currentStage];
+                }
+                else
+                {
+                    isFullyGrown = true;
+                }
+            }
+        }
+
         if (isFullyGrown && Input.GetMouseButtonDown(1))
         {
             Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -61,6 +63,12 @@ public class CropGrowth : MonoBehaviour
             Instantiate(harvestItemPrefab, transform.position, Quaternion.identity);
         }
 
-        Destroy(gameObject); // Xóa cây sau khi thu hoạch
+        FarmManager.Instance.RemoveCropAt(cellPosition);
+        Destroy(gameObject);
+    }
+
+    public void SetCellPosition(Vector3Int pos)
+    {
+        cellPosition = pos;
     }
 }
