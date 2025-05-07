@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TimeManager : MonoBehaviour
 {
-    public float realSecondsPerGameDay = 15f; // 24p ngoài đời = 1 ngày game
+    public float realSecondsPerGameDay = 30f; // 24p ngoài đời = 1 ngày game
     public float currentTime; // thời gian hiện tại trong ngày game (0 đến 24)
 
     public delegate void TimeChanged(float gameHour);
