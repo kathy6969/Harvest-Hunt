@@ -18,6 +18,10 @@ public class RandomRomGeneratev1 : MonoBehaviour
     private Dictionary<Vector2Int, int> map = new();
     private List<RectInt> rooms = new();
 
+    public GameObject monsterPrefab;
+    public int MinMonsterCount;
+    public int MaxMonsterCount;
+
     void Start()
     {
         GenerateRooms();
@@ -58,11 +62,56 @@ public class RandomRomGeneratev1 : MonoBehaviour
 
             rooms.Add(newRoom);
             CarveRoom(newRoom);
-            ConnectRooms(Vector2Int.RoundToInt(rooms[i - 1].center), Vector2Int.RoundToInt(newRoom.center));
+        }
+
+        // Nối các phòng: mỗi phòng nối 1–3 phòng gần nhất, không bị cô lập
+        HashSet<int> connectedRooms = new();
+
+        for (int i = 1; i < rooms.Count; i++)
+        {
+            Vector2Int centerA = Vector2Int.RoundToInt(rooms[i].center);
+            List<(float dist, int index, Vector2Int center)> nearby = new();
+
+            for (int j = 0; j < rooms.Count; j++)
+            {
+                if (i == j) continue;
+                Vector2Int centerB = Vector2Int.RoundToInt(rooms[j].center);
+                float distance = Vector2Int.Distance(centerA, centerB);
+                nearby.Add((distance, j, centerB));
+            }
+
+            nearby.Sort((a, b) => a.dist.CompareTo(b.dist));
+
+            int connectionCount = Random.Range(1, 4);
+            int connectionsMade = 0;
+
+            foreach (var (dist, index, centerB) in nearby)
+            {
+                if (connectionsMade >= connectionCount) break;
+
+                if (!connectedRooms.Contains(i) || !connectedRooms.Contains(index))
+                {
+                    ConnectRooms(centerA, centerB);
+                    connectedRooms.Add(i);
+                    connectedRooms.Add(index);
+                    connectionsMade++;
+                }
+            }
+
+            // Nếu vẫn chưa nối ai, bắt buộc nối ít nhất 1
+            if (!connectedRooms.Contains(i) && nearby.Count > 0)
+            {
+                var fallback = nearby[0];
+                ConnectRooms(centerA, fallback.center);
+                connectedRooms.Add(i);
+                connectedRooms.Add(fallback.index);
+            }
         }
 
         FillWalls();
+        SpawnMonstersInRooms();
     }
+
 
     void CarveRoom(RectInt room)
     {
@@ -137,6 +186,26 @@ public class RandomRomGeneratev1 : MonoBehaviour
                 groundTilemap.SetTile((Vector3Int)pair.Key, groundTile);
             else if (pair.Value == 1)
                 wallTilemap.SetTile((Vector3Int)pair.Key, wallTile);
+        }
+    }
+
+    void SpawnMonstersInRooms()
+    {
+        for (int i = 1; i < rooms.Count; i++) // bỏ qua phòng 0 (phòng xuất phát)
+        {
+            RectInt room = rooms[i];
+            int monsterCount = Random.Range(MinMonsterCount, MaxMonsterCount);
+
+            for (int j = 0; j < monsterCount; j++)
+            {
+                Vector2Int spawnPos = new Vector2Int(
+                    Random.Range(room.xMin + 1, room.xMax - 1),
+                    Random.Range(room.yMin + 1, room.yMax - 1)
+                );
+
+                Vector3 worldPos = groundTilemap.CellToWorld((Vector3Int)spawnPos) + new Vector3(0.5f, 0.5f, 0);
+                Instantiate(monsterPrefab, worldPos, Quaternion.identity);
+            }
         }
     }
 }
