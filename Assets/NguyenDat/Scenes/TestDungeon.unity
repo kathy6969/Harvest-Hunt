@@ -550,11 +550,11 @@ MonoBehaviour:
   wallTilemap: {fileID: 1780368004}
   groundTile: {fileID: 11400000, guid: 4edff513866c7e44b8af7a82506bae5d, type: 2}
   wallTile: {fileID: 11400000, guid: 1cf04d939cd118f4da744deb9c9ff302, type: 2}
-  minRoomCount: 5
-  maxRoomCount: 10
-  roomSizeMinMax: {x: 20, y: 50}
-  mapRange: 30
-  irregularSteps: 25
+  minRoomCount: 10
+  maxRoomCount: 20
+  roomSizeMinMax: {x: 50, y: 100}
+  mapRange: 100
+  irregularSteps: 100
 --- !u!114 &2097968324
 MonoBehaviour:
   m_ObjectHideFlags: 0

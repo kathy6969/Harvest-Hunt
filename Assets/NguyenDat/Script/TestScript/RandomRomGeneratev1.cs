@@ -89,14 +89,21 @@ public class RandomRomGeneratev1 : MonoBehaviour
         while (current.x != b.x)
         {
             current.x += (b.x > current.x) ? 1 : -1;
-            map[current] = 0;
+            CarveCorridorTile(current, Vector2Int.up); // mở rộng theo trục y
         }
 
         while (current.y != b.y)
         {
             current.y += (b.y > current.y) ? 1 : -1;
-            map[current] = 0;
+            CarveCorridorTile(current, Vector2Int.right); // mở rộng theo trục x
         }
+    }
+
+    // Hành lang 2 tile: đục 1 tile chính + 1 tile sang một phía
+    void CarveCorridorTile(Vector2Int pos, Vector2Int offset)
+    {
+        map[pos] = 0;
+        map[pos + offset] = 0;
     }
 
     void FillWalls()
