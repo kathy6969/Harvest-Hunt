@@ -511,6 +511,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2097968322}
   - component: {fileID: 2097968323}
+  - component: {fileID: 2097968324}
   m_Layer: 0
   m_Name: RandomRoomGenerator
   m_TagString: Untagged
@@ -540,17 +541,40 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2097968321}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e7c5f3f8c8128644692d538a2dd597d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   groundTilemap: {fileID: 904792711}
   wallTilemap: {fileID: 1780368004}
-  groundTile: {fileID: 11400000, guid: cddeb3495b208f2448af80539cfd4db8, type: 2}
-  wallTile: {fileID: 11400000, guid: de332e2c3b4c85b4b95fe06209d0666f, type: 2}
-  walkLength: 1000
-  smoothIterations: 5
+  groundTile: {fileID: 11400000, guid: 4edff513866c7e44b8af7a82506bae5d, type: 2}
+  wallTile: {fileID: 11400000, guid: 1cf04d939cd118f4da744deb9c9ff302, type: 2}
+  minRoomCount: 5
+  maxRoomCount: 10
+  roomSizeMinMax: {x: 20, y: 50}
+  mapRange: 30
+  irregularSteps: 25
+--- !u!114 &2097968324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2097968321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 724a67295ddef3e4893685735a207483, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  groundTilemap: {fileID: 904792711}
+  wallTilemap: {fileID: 1780368004}
+  groundTile: {fileID: 11400000, guid: a09d5fdc33a4c1d4795b1ff6b87b438b, type: 2}
+  wallTile: {fileID: 11400000, guid: 1cf04d939cd118f4da744deb9c9ff302, type: 2}
+  minRoomCount: 10
+  maxRoomCount: 20
+  roomSizeMinMax: {x: 10, y: 20}
+  mapRange: 50
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

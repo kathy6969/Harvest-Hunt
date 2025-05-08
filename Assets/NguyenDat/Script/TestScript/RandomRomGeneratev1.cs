@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class RandomRoomGenerator : MonoBehaviour
+public class RandomRomGeneratev1 : MonoBehaviour
 {
     public Tilemap groundTilemap;
     public Tilemap wallTilemap;
@@ -14,10 +14,9 @@ public class RandomRoomGenerator : MonoBehaviour
     public int maxRoomCount = 10;
     public Vector2Int roomSizeMinMax = new Vector2Int(5, 10);
     public int mapRange = 30;
-    public int irregularSteps = 50;
 
     private Dictionary<Vector2Int, int> map = new();
-    private List<IrregularRoom> rooms = new();
+    private List<RectInt> rooms = new();
 
     void Start()
     {
@@ -31,7 +30,7 @@ public class RandomRoomGenerator : MonoBehaviour
         rooms.Clear();
 
         // Tạo phòng gốc tại (0,0)
-        IrregularRoom startRoom = GenerateIrregularRoom(Vector2Int.zero, irregularSteps);
+        RectInt startRoom = new RectInt(-5, -5, 10, 10);
         rooms.Add(startRoom);
         CarveRoom(startRoom);
 
@@ -39,17 +38,19 @@ public class RandomRoomGenerator : MonoBehaviour
 
         for (int i = 1; i < roomCount; i++)
         {
-            IrregularRoom newRoom;
+            RectInt newRoom;
             int tries = 0;
 
             do
             {
                 tries++;
+                int width = Random.Range(roomSizeMinMax.x, roomSizeMinMax.y + 1);
+                int height = Random.Range(roomSizeMinMax.x, roomSizeMinMax.y + 1);
                 Vector2Int pos = new Vector2Int(
                     Random.Range(-mapRange, mapRange),
                     Random.Range(-mapRange, mapRange)
                 );
-                newRoom = GenerateIrregularRoom(pos, irregularSteps);
+                newRoom = new RectInt(pos, new Vector2Int(width, height));
             }
             while (RoomOverlaps(newRoom) && tries < 10);
 
@@ -57,53 +58,26 @@ public class RandomRoomGenerator : MonoBehaviour
 
             rooms.Add(newRoom);
             CarveRoom(newRoom);
-            ConnectRooms(rooms[i - 1].GetCenter(), newRoom.GetCenter());
+            ConnectRooms(Vector2Int.RoundToInt(rooms[i - 1].center), Vector2Int.RoundToInt(newRoom.center));
         }
 
         FillWalls();
     }
 
-    IrregularRoom GenerateIrregularRoom(Vector2Int startPos, int steps)
+    void CarveRoom(RectInt room)
     {
-        IrregularRoom room = new IrregularRoom();
-        Vector2Int currentPos = startPos;
-        room.tiles.Add(currentPos);
-
-        Vector2Int[] directions = new Vector2Int[] {
-            Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right
-        };
-
-        for (int i = 0; i < steps; i++)
-        {
-            Vector2Int dir = directions[Random.Range(0, directions.Length)];
-            currentPos += dir;
-
-            if (!room.tiles.Contains(currentPos) && IsInMapBounds(currentPos))
-            {
-                room.tiles.Add(currentPos);
-            }
-        }
-
-        return room;
-    }
-
-    void CarveRoom(IrregularRoom room)
-    {
-        foreach (Vector2Int pos in room.tiles)
+        foreach (Vector2Int pos in room.allPositionsWithin)
         {
             map[pos] = 0;
         }
     }
 
-    bool RoomOverlaps(IrregularRoom newRoom)
+    bool RoomOverlaps(RectInt newRoom)
     {
         foreach (var room in rooms)
         {
-            foreach (var pos in newRoom.tiles)
-            {
-                if (room.tiles.Contains(pos))
-                    return true;
-            }
+            if (room.Overlaps(newRoom))
+                return true;
         }
         return false;
     }
@@ -157,27 +131,5 @@ public class RandomRoomGenerator : MonoBehaviour
             else if (pair.Value == 1)
                 wallTilemap.SetTile((Vector3Int)pair.Key, wallTile);
         }
-    }
-
-    bool IsInMapBounds(Vector2Int pos)
-    {
-        return Mathf.Abs(pos.x) <= mapRange && Mathf.Abs(pos.y) <= mapRange;
-    }
-}
-
-public class IrregularRoom
-{
-    public List<Vector2Int> tiles = new List<Vector2Int>();
-
-    public Vector2Int GetCenter()
-    {
-        if (tiles.Count == 0) return Vector2Int.zero;
-        int x = 0, y = 0;
-        foreach (var t in tiles)
-        {
-            x += t.x;
-            y += t.y;
-        }
-        return new Vector2Int(x / tiles.Count, y / tiles.Count);
     }
 }
