@@ -2,15 +2,16 @@
 
 public class CropGrowth : MonoBehaviour
 {
-    public Sprite[] growthStages; // 4 sprites cho các giai đoạn
-    public float timeBetweenStages = 5f; // thời gian giữa các giai đoạn (test)
-    public GameObject harvestItemPrefab; // prefab item khi thu hoạch
+    public Sprite[] growthStages;
+    public float timeBetweenStages = 5f;
+    public GameObject harvestItemPrefab;
 
     private int currentStage = 0;
     private SpriteRenderer spriteRenderer;
     private float timer = 0f;
     private bool isFullyGrown = false;
     private Camera mainCamera;
+    private Vector3Int cellPosition;
 
     void Start()
     {
@@ -23,7 +24,6 @@ public class CropGrowth : MonoBehaviour
 
     void Update()
     {
-        // Tự động chuyển giai đoạn theo thời gian
         if (!isFullyGrown)
         {
             timer += Time.deltaTime;
@@ -43,7 +43,6 @@ public class CropGrowth : MonoBehaviour
             }
         }
 
-        // Khi đã trưởng thành, cho phép thu hoạch bằng chuột phải
         if (isFullyGrown && Input.GetMouseButtonDown(1))
         {
             Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -64,6 +63,12 @@ public class CropGrowth : MonoBehaviour
             Instantiate(harvestItemPrefab, transform.position, Quaternion.identity);
         }
 
-        Destroy(gameObject); // Xóa cây sau khi thu hoạch
+        FarmManager.Instance.RemoveCropAt(cellPosition);
+        Destroy(gameObject);
+    }
+
+    public void SetCellPosition(Vector3Int pos)
+    {
+        cellPosition = pos;
     }
 }

@@ -1,29 +1,33 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class NewBehaviourScript : MonoBehaviour
+public class PlantSpawner : MonoBehaviour
 {
-    public GameObject plantPrefab;      // Prefab cây (kéo vào từ Inspector)
-    private Camera mainCamera;
-    private Tilemap tilemap;
-    private SeedFollowMouse followScript;
-    private PauseMenu plantManager;
+    public GameObject plantPrefab;
+    public Grid grid; // Gán qua Inspector
+    public Camera mainCamera;
 
+    private SeedFollowMouse followScript;
 
     void Start()
     {
-        mainCamera = Camera.main;
-        tilemap = FindObjectOfType<Tilemap>();
         followScript = GetComponent<SeedFollowMouse>();
-        plantManager = FindObjectOfType<PauseMenu>();
 
+        if (mainCamera == null)
+            mainCamera = Camera.main;
+
+        // Tự động tìm Grid ở cha hoặc trong scene
+        if (grid == null)
+            grid = GetComponentInParent<Grid>();
+        if (grid == null)
+            grid = FindObjectOfType<Grid>();
+
+        if (grid == null)
+            Debug.LogError("Không tìm thấy Grid trong PlantSpawner!");
     }
 
     void Update()
     {
-        // Chỉ cho phép trồng cây khi đang follow chuột
         if (followScript != null && followScript.IsFollowing())
         {
             if (Input.GetMouseButtonDown(1)) // Chuột phải
@@ -31,20 +35,16 @@ public class NewBehaviourScript : MonoBehaviour
                 Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
                 mouseWorldPos.z = 0f;
 
-                Vector3Int cellPos = tilemap.WorldToCell(mouseWorldPos);
-                Vector3 spawnPos = tilemap.GetCellCenterWorld(cellPos);
+                Vector3Int cellPos = grid.WorldToCell(mouseWorldPos);
+                Vector3 spawnPos = grid.GetCellCenterWorld(cellPos);
 
-                //Instantiate(plantPrefab, spawnPos, Quaternion.identity);
-                GameObject newPlant = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
+                // Kiểm tra: có thể trồng và chưa có cây
+                if (FarmManager.Instance.IsTileHoed(cellPos) && !FarmManager.Instance.HasCrop(cellPos))
+                {
+                    GameObject newPlant = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
 
-                // 🔥 Thêm cây vào danh sách cây đã trồng
-                if (plantManager != null)
-                {
-                    plantManager.allPlantedObjects.Add(newPlant);
-                }
-                else
-                {
-                    Debug.LogWarning("Không tìm thấy PlantManager!");
+                    // (Không cần gọi SetCellPosition nếu CropGrowth không có)
+                    FarmManager.Instance.AddCrop(cellPos, newPlant);
                 }
             }
         }
