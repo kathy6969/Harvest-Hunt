@@ -3,14 +3,15 @@ using UnityEngine.Tilemaps;
 
 public class HoeSystem : MonoBehaviour
 {
-    public Tilemap tilemap1;      // Tilemap nền (cỏ)
-    public Tilemap tilemap2;      // Tilemap đã cuốc (trống, sẽ vẽ hoedTile)
-    public TileBase grassTile;    // Tile cỏ (trên tilemap1)
-    public TileBase hoedTile;     // Tile đã cuốc (vẽ lên tilemap2)
+    public Tilemap tilemap1;
+    public Tilemap tilemap2;
+    public TileBase grassTile;
+    public TileBase hoedTile;
     public Transform player;
     public LineRenderer lineRenderer;
 
     private Vector3Int lastCell;
+    private PlayerController playerController;
 
     void Start()
     {
@@ -22,6 +23,10 @@ public class HoeSystem : MonoBehaviour
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
         lineRenderer.startColor = Color.green;
         lineRenderer.endColor = Color.green;
+
+        playerController = player.GetComponent<PlayerController>();
+        if (playerController == null)
+            Debug.LogError("Không tìm thấy PlayerController trên Player!");
     }
 
     void Update()
@@ -30,7 +35,11 @@ public class HoeSystem : MonoBehaviour
         Vector3Int cellPos = tilemap1.WorldToCell(mouseWorldPos);
         Vector3Int playerCell = tilemap1.WorldToCell(player.position);
 
-        bool isInRange = Mathf.Abs(cellPos.x - playerCell.x) <= 1 && Mathf.Abs(cellPos.y - playerCell.y) <= 1;
+        int dx = Mathf.Abs(cellPos.x - playerCell.x);
+        int dy = Mathf.Abs(cellPos.y - playerCell.y);
+
+        // Cho phép đào ô kề bên, bao gồm chéo
+        bool isInRange = (dx <= 1 && dy <= 1) && (dx + dy != 0);
 
         if (cellPos != lastCell)
         {
@@ -40,15 +49,25 @@ public class HoeSystem : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))  // Chuột trái
         {
+            if (cellPos == playerCell)
+            {
+                Debug.Log("Không thể cuốc ngay dưới chân!");
+                return;
+            }
+
             if (isInRange)
             {
                 TileBase currentTile = tilemap1.GetTile(cellPos);
                 if (currentTile == grassTile)
                 {
-                    tilemap1.SetTile(cellPos, null);          // Xóa tile ở tilemap1
-                    tilemap2.SetTile(cellPos, hoedTile);     // Vẽ tile đã cuốc lên tilemap2
+                    tilemap1.SetTile(cellPos, null);
+                    tilemap2.SetTile(cellPos, hoedTile);
                     FarmManager.Instance.AddHoedTile(cellPos);
                     Debug.Log($"Đã cuốc ô {cellPos}");
+
+                    Vector2Int playerCell2D = new Vector2Int(playerCell.x, playerCell.y);
+                    Vector2Int targetCell2D = new Vector2Int(cellPos.x, cellPos.y);
+                    playerController.SetDigDirection(playerCell2D, targetCell2D);
                 }
                 else
                 {
