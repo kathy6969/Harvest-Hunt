@@ -77,7 +77,7 @@ public class TimeManager : MonoBehaviour
     {
         if (month >= 3 && month <= 5) return "Spring";
         if (month >= 6 && month <= 8) return "Summer";
-        if (month >= 9 && month <= 11) return "Autumn";
+        if (month >= 9 && month <= 11) return "Fall";
         return "Winter"; // Tháng 12, 1, 2
     }
 }
