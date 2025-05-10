@@ -3176,8 +3176,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   globalLight: {fileID: 1025412549}
   morningIntensity: 0.6
-  noonIntensity: 1.2
-  eveningIntensity: 0.7
+  noonIntensity: 1.7
+  eveningIntensity: 0.8
   nightIntensity: 0.5
   morningColor: {r: 1, g: 0.98294216, b: 0.72264147, a: 1}
   noonColor: {r: 1, g: 0.9605495, b: 0.5566037, a: 1}
