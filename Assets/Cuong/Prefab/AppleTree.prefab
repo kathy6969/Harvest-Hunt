@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7446195485911642248}
   - component: {fileID: 4004835640486319969}
   - component: {fileID: 3537731842582503366}
+  - component: {fileID: 9131965760845686028}
   m_Layer: 0
   m_Name: AppleTree
   m_TagString: Untagged
@@ -149,4 +150,17 @@ MonoBehaviour:
   - {fileID: 1918308107, guid: 7e8b9ba89c4367346a7c212b250eca7a, type: 3}
   - {fileID: 399873213, guid: 7e8b9ba89c4367346a7c212b250eca7a, type: 3}
   timeBetweenStages: 5
-  harvestItemPrefab: {fileID: 0}
+  harvestItemPrefab: {fileID: 6377205883117827067, guid: 55434b71424bc3a4095318c74ed5f634, type: 3}
+--- !u!114 &9131965760845686028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2975580786270537323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e5219a1e4805bc4dbb830ae268fa504, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dropOffsetY: 1
